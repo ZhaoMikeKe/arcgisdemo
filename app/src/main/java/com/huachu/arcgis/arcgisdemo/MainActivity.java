@@ -103,7 +103,12 @@ public class MainActivity extends AppCompatActivity {
         });
 
         setupMap();//地图设置
-        createPointGraphics();//点
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                createPointGraphics();//点
+            }
+        }).start();
         createPolylineGraphics();//线
         createPolygonGraphics();//面
         //setupLocationDisplay();//定位
@@ -337,21 +342,26 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void createPointGraphics() {//点
-        Point point = new Point(114.71511, 38.09042, SpatialReferences.getWgs84());
-        //普通点
-        SimpleMarkerSymbol pointSymbol = new SimpleMarkerSymbol(SimpleMarkerSymbol.Style.CIRCLE, Color.rgb(226, 119, 40), 10.0f);
-        pointSymbol.setOutline(new SimpleLineSymbol(SimpleLineSymbol.Style.SOLID, Color.BLUE, 2.0f));
-        //图片点
-        PictureMarkerSymbol pictureMarkerSymbol = new PictureMarkerSymbol((BitmapDrawable) ImageUtils.bitmap2Drawable(ImageUtils.getBitmap(R.drawable.car)));
-        Map<String, Object> attr = new HashMap<>();
+        double x = 114.71511;
+        double y = 38.09042;
+        for (int i = 0; i < 1; i++) {
+            Point point = new Point(x, y, SpatialReferences.getWgs84());
+            //普通点
+            //SimpleMarkerSymbol pointSymbol = new SimpleMarkerSymbol(SimpleMarkerSymbol.Style.CIRCLE, Color.rgb(226, 119, 40), 10.0f);
+            //pointSymbol.setOutline(new SimpleLineSymbol(SimpleLineSymbol.Style.SOLID, Color.BLUE, 2.0f));
+            //图片点
+            PictureMarkerSymbol pictureMarkerSymbol = new PictureMarkerSymbol((BitmapDrawable) ImageUtils.bitmap2Drawable(ImageUtils.getBitmap(R.drawable.ic_cheliang)));
+        /*Map<String, Object> attr = new HashMap<>();
         attr.put("position", 0);
         attr.put("name", "car");
-        Graphic pointGraphic = new Graphic(point, attr, pictureMarkerSymbol);
-        //Graphic pointGraphic = new Graphic(point, pictureMarkerSymbol);
-        //pointGraphic.setSelected(true);
-        //Point point1 = pointGraphic.computeCalloutLocation(point, mMapView);
-        mGraphicsOverlay.getGraphics().add(pointGraphic);
-
+        Graphic pointGraphic = new Graphic(point, attr, pictureMarkerSymbol);*/
+            Graphic pointGraphic = new Graphic(point, pictureMarkerSymbol);
+            //pointGraphic.setSelected(true);
+            //Point point1 = pointGraphic.computeCalloutLocation(point, mMapView);
+            mGraphicsOverlay.getGraphics().add(pointGraphic);
+            x += 0.001;
+            y += 0.001;
+        }
     }
 
 
