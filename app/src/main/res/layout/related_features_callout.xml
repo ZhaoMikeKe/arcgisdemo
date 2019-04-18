@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="200dp"
     android:layout_height="wrap_content">
 
     <TextView
         android:id="@+id/park_name"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
+        android:layout_width="200dp"
+        android:layout_height="30dp"
         android:layout_alignParentTop="true"
+        android:gravity="center"
+        android:text="666"
         android:textColor="#474747" />
 
     <Spinner
@@ -17,6 +17,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/park_name"
-        android:drawSelectorOnTop="true"/>
+        android:drawSelectorOnTop="true"
+        android:visibility="gone" />
+
+    <ImageView
+        android:id="@+id/iv_"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/park_name"
+        android:src="@mipmap/ic_launcher" />
 
 </RelativeLayout>

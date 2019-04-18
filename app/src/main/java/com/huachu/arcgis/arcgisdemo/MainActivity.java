@@ -147,6 +147,7 @@ public class MainActivity extends AppCompatActivity {
             mMapView.getGraphicsOverlays().add(mGraphicsOverlay);
             mMapView.setMap(map);
             mMapView.setViewpoint(new Viewpoint(point, 100000));
+            mMapView.setAttributionTextVisible(false);//去掉最下面的水印
             mCallout = mMapView.getCallout();
             // 设定单击事件
             mMapView.setOnTouchListener(new DefaultMapViewOnTouchListener(this, mMapView) {
@@ -215,6 +216,8 @@ public class MainActivity extends AppCompatActivity {
         android.graphics.Point screenPoint = new android.graphics.Point(Math.round(motionEvent.getX()),
                 Math.round(motionEvent.getY()));
         // from the graphics overlay, get graphics near the tapped location
+        // create a map point from screen point
+        Point mapPoint = mMapView.screenToLocation(screenPoint);
         final ListenableFuture<IdentifyGraphicsOverlayResult> identifyResultsFuture = mMapView
                 .identifyGraphicsOverlayAsync(mGraphicsOverlay, screenPoint, 10, false);
         identifyResultsFuture.addDoneListener(new Runnable() {
@@ -258,6 +261,7 @@ public class MainActivity extends AppCompatActivity {
         Point calloutLocation = graphic.computeCalloutLocation(graphic.getGeometry().getExtent().getCenter(), mMapView);
         mCallout.setGeoElement(graphic, calloutLocation);
         mCallout.show();
+        mMapView.setViewpointCenterAsync(calloutLocation);
     }
 
     private void setupLocationDisplay() {
