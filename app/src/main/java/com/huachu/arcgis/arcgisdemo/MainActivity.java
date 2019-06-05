@@ -29,6 +29,7 @@ import com.blankj.utilcode.util.ImageUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.esri.arcgisruntime.concurrent.ListenableFuture;
 import com.esri.arcgisruntime.geometry.GeometryEngine;
+import com.esri.arcgisruntime.geometry.Multipoint;
 import com.esri.arcgisruntime.geometry.Point;
 import com.esri.arcgisruntime.geometry.PointCollection;
 import com.esri.arcgisruntime.geometry.Polygon;
@@ -45,6 +46,7 @@ import com.esri.arcgisruntime.mapping.view.GraphicsOverlay;
 import com.esri.arcgisruntime.mapping.view.IdentifyGraphicsOverlayResult;
 import com.esri.arcgisruntime.mapping.view.LocationDisplay;
 import com.esri.arcgisruntime.mapping.view.MapView;
+import com.esri.arcgisruntime.symbology.MultilayerPolylineSymbol;
 import com.esri.arcgisruntime.symbology.PictureMarkerSymbol;
 import com.esri.arcgisruntime.symbology.SimpleFillSymbol;
 import com.esri.arcgisruntime.symbology.SimpleLineSymbol;
@@ -216,6 +218,8 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    Graphic graphic;
+
     private void identifyGraphic(MotionEvent motionEvent) {//判断点击的graphic
         // get the screen point
         android.graphics.Point screenPoint = new android.graphics.Point(Math.round(motionEvent.getX()),
@@ -229,12 +233,16 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 try {
+                    if (graphic != null)
+                        graphic.setSelected(false);
                     IdentifyGraphicsOverlayResult identifyGraphicsOverlayResult = identifyResultsFuture.get();
                     List<Graphic> graphics = identifyGraphicsOverlayResult.getGraphics();
                     // if a graphic has been identified
                     if (graphics.size() > 0) {
                         //get the first graphic identified
                         Graphic identifiedGraphic = graphics.get(0);
+                        graphic = identifiedGraphic;
+                        identifiedGraphic.setSelected(true);
                         showCallout(identifiedGraphic);
                     } else {
                         // if no graphic identified
@@ -327,18 +335,26 @@ public class MainActivity extends AppCompatActivity {
 
     private void createPolylineGraphics() {//线
         PointCollection polylinePoints = new PointCollection(SpatialReferences.getWgs84());
-        polylinePoints.add(new Point(114.71511, 38.09042));
+        polylinePoints.add(new Point(114.72511, 38.09042));
+        polylinePoints.add(new Point(114.72511, 38.08842));
+        polylinePoints.add(new Point(114.72511, 38.08642));
+        polylinePoints.add(new Point(114.72511, 38.08442));
+        polylinePoints.add(new Point(114.72511, 38.08242));
         polylinePoints.add(new Point(114.72511, 38.08042));
         Polyline polyline = new Polyline(polylinePoints);
+        // show the original points as red dots on the map
+        Multipoint originalMultipoint = new Multipoint(polylinePoints);
+        PictureMarkerSymbol pictureMarkerSymbol = new PictureMarkerSymbol((BitmapDrawable) ImageUtils.bitmap2Drawable(ImageUtils.getBitmap(R.drawable.ic_cheliang)));
+        Graphic originalPointsGraphic = new Graphic(originalMultipoint, pictureMarkerSymbol);
+        mGraphicsOverlay.getGraphics().add(originalPointsGraphic);
+
         SimpleLineSymbol polylineSymbol = new SimpleLineSymbol(SimpleLineSymbol.Style.SOLID, Color.BLUE, 3.0f);
         Map<String, Object> attr = new HashMap<>();
         attr.put("position", 1);
         attr.put("name", "line");
         Graphic polylineGraphic = new Graphic(polyline, attr, polylineSymbol);
         //Graphic polylineGraphic = new Graphic(polyline, polylineSymbol);
-        //polylineGraphic.setSelected(true);
         mGraphicsOverlay.getGraphics().add(polylineGraphic);
-
     }
 
     private void createPointGraphics() {//点
@@ -351,11 +367,12 @@ public class MainActivity extends AppCompatActivity {
             //pointSymbol.setOutline(new SimpleLineSymbol(SimpleLineSymbol.Style.SOLID, Color.BLUE, 2.0f));
             //图片点
             PictureMarkerSymbol pictureMarkerSymbol = new PictureMarkerSymbol((BitmapDrawable) ImageUtils.bitmap2Drawable(ImageUtils.getBitmap(R.drawable.ic_cheliang)));
-        /*Map<String, Object> attr = new HashMap<>();
-        attr.put("position", 0);
-        attr.put("name", "car");
-        Graphic pointGraphic = new Graphic(point, attr, pictureMarkerSymbol);*/
-            Graphic pointGraphic = new Graphic(point, pictureMarkerSymbol);
+            // SimpleFillSymbol fillSymbol = new SimpleFillSymbol(SimpleFillSymbol.Style.SOLID, Color.YELLOW, pointSymbol);
+            Map<String, Object> attr = new HashMap<>();
+            attr.put("position", 0);
+            attr.put("name", "car");
+            Graphic pointGraphic = new Graphic(point, attr, pictureMarkerSymbol);
+            //Graphic pointGraphic = new Graphic(point, pictureMarkerSymbol);
             //pointGraphic.setSelected(true);
             //Point point1 = pointGraphic.computeCalloutLocation(point, mMapView);
             mGraphicsOverlay.getGraphics().add(pointGraphic);
