@@ -3,30 +3,18 @@ package com.huachu.arcgis.arcgisdemo;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.res.AssetManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
-import android.net.Uri;
-import android.os.Environment;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.style.DrawableMarginSpan;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
-
 
 import com.blankj.utilcode.util.ImageUtils;
-import com.blankj.utilcode.util.ToastUtils;
 import com.esri.arcgisruntime.concurrent.ListenableFuture;
 import com.esri.arcgisruntime.geometry.GeometryEngine;
 import com.esri.arcgisruntime.geometry.Multipoint;
@@ -46,25 +34,29 @@ import com.esri.arcgisruntime.mapping.view.GraphicsOverlay;
 import com.esri.arcgisruntime.mapping.view.IdentifyGraphicsOverlayResult;
 import com.esri.arcgisruntime.mapping.view.LocationDisplay;
 import com.esri.arcgisruntime.mapping.view.MapView;
-import com.esri.arcgisruntime.symbology.MultilayerPolylineSymbol;
 import com.esri.arcgisruntime.symbology.PictureMarkerSymbol;
 import com.esri.arcgisruntime.symbology.SimpleFillSymbol;
 import com.esri.arcgisruntime.symbology.SimpleLineSymbol;
-import com.esri.arcgisruntime.symbology.SimpleMarkerSymbol;
-import com.esri.arcgisruntime.util.ListenableList;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+
 
 public class MainActivity extends AppCompatActivity {
+    @BindView(R.id.point)
+    Button point;
+    @BindView(R.id.line)
+    Button line;
+    @BindView(R.id.fill)
+    Button fill;
+    @BindView(R.id.location)
+    Button location;
     private MapView mMapView;
     private GraphicsOverlay mGraphicsOverlay;
     private RxPermissions rxPermissions;
@@ -75,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
         mMapView = findViewById(R.id.mapView);
         rxPermissions = new RxPermissions(this);
         TextView tvCompany = findViewById(R.id.tv_company);
@@ -105,14 +98,14 @@ public class MainActivity extends AppCompatActivity {
         });
 
         setupMap();//地图设置
-        new Thread(new Runnable() {
+       /* new Thread(new Runnable() {
             @Override
             public void run() {
-                createPointGraphics();//点
+                //createPointGraphics();//点
             }
-        }).start();
-        createPolylineGraphics();//线
-        createPolygonGraphics();//面
+        }).start();*/
+        //createPolylineGraphics();//线
+        //createPolygonGraphics();//面
         //setupLocationDisplay();//定位
     }
 
@@ -255,7 +248,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void showCallout(final Graphic graphic) {
+    private void showCallout(Graphic graphic) {
         // create a TextView for the Callout
        /* TextView calloutContent = new TextView(getApplicationContext());
         calloutContent.setTextColor(Color.BLACK);
@@ -273,6 +266,9 @@ public class MainActivity extends AppCompatActivity {
         // set the leader position and show the callout
         Point calloutLocation = graphic.computeCalloutLocation(graphic.getGeometry().getExtent().getCenter(), mMapView);
         mCallout.setGeoElement(graphic, calloutLocation);
+        //mCallout.setStyle(new Callout.Style(this, R.layout.related_features_callout));
+        Callout.Style calloutStyle = new Callout.Style(this, R.xml.callout_style);
+        mCallout.setStyle(calloutStyle);
         mCallout.show();
         mMapView.setViewpointCenterAsync(calloutLocation);
     }
@@ -321,6 +317,7 @@ public class MainActivity extends AppCompatActivity {
         polygonPoints.add(new Point(114.6979656552508, 38.040267760924316));
         polygonPoints.add(new Point(114.70259112469694, 38.038800278306674));
         polygonPoints.add(new Point(114.70372100524446, 38.03519536420519));
+
         Polygon polygon = new Polygon(polygonPoints);
         SimpleFillSymbol polygonSymbol = new SimpleFillSymbol(SimpleFillSymbol.Style.SOLID, Color.argb(60, 226, 119, 40),
                 new SimpleLineSymbol(SimpleLineSymbol.Style.SOLID, Color.BLUE, 2.0f));
@@ -330,7 +327,7 @@ public class MainActivity extends AppCompatActivity {
         Graphic polygonGraphic = new Graphic(polygon, attr, polygonSymbol);
         //Graphic polygonGraphic = new Graphic(polygon, polygonSymbol);
         mGraphicsOverlay.getGraphics().add(polygonGraphic);
-
+        //mMapView.setViewpointCenterAsync(new Point(114.71153226844807, 38.06035488360282));
     }
 
     private void createPolylineGraphics() {//线
@@ -341,6 +338,7 @@ public class MainActivity extends AppCompatActivity {
         polylinePoints.add(new Point(114.72511, 38.08442));
         polylinePoints.add(new Point(114.72511, 38.08242));
         polylinePoints.add(new Point(114.72511, 38.08042));
+
         Polyline polyline = new Polyline(polylinePoints);
         // show the original points as red dots on the map
         Multipoint originalMultipoint = new Multipoint(polylinePoints);
@@ -355,11 +353,10 @@ public class MainActivity extends AppCompatActivity {
         Graphic polylineGraphic = new Graphic(polyline, attr, polylineSymbol);
         //Graphic polylineGraphic = new Graphic(polyline, polylineSymbol);
         mGraphicsOverlay.getGraphics().add(polylineGraphic);
+        //mMapView.setViewpointCenterAsync(new Point(114.72511, 38.08442));
     }
 
-    private void createPointGraphics() {//点
-        double x = 114.71511;
-        double y = 38.09042;
+    private void createPointGraphics(double x, double y) {//点
         for (int i = 0; i < 1; i++) {
             Point point = new Point(x, y, SpatialReferences.getWgs84());
             //普通点
@@ -378,7 +375,9 @@ public class MainActivity extends AppCompatActivity {
             mGraphicsOverlay.getGraphics().add(pointGraphic);
             x += 0.001;
             y += 0.001;
+            mMapView.setViewpointCenterAsync(point);
         }
+
     }
 
 
@@ -398,4 +397,32 @@ public class MainActivity extends AppCompatActivity {
 
                 });
     }
+
+    @OnClick({R.id.location, R.id.point, R.id.line, R.id.fill})
+    public void onViewClicked(View view) {
+        switch (view.getId()) {
+            case R.id.point:
+                mCallout.dismiss();
+                mGraphicsOverlay.getGraphics().clear();
+                createPointGraphics(114.71511, 38.09042);
+                break;
+            case R.id.line:
+                mCallout.dismiss();
+                mGraphicsOverlay.getGraphics().clear();
+                createPolylineGraphics();//线
+                break;
+            case R.id.fill:
+                mCallout.dismiss();
+                mGraphicsOverlay.getGraphics().clear();
+                createPolygonGraphics();//面
+                break;
+            case R.id.location:
+                mCallout.dismiss();
+                mGraphicsOverlay.getGraphics().clear();
+                setupLocationDisplay();
+                break;
+        }
+    }
+
+
 }

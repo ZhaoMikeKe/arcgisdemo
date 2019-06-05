@@ -3,7 +3,6 @@ package com.huachu.arcgis.arcgisdemo;
 import android.app.Application;
 
 
-
 import com.esri.arcgisruntime.ArcGISRuntimeEnvironment;
 
 
