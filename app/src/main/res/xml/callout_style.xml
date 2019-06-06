@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <calloutStyle
-        backgroundColor="@color/colorPrimaryDark"
-        borderColor="@android:color/white"
-        borderWidth="2"
+        backgroundColor="#00ffffff"
+        borderColor="#00ffffff"
+        borderWidth="0"
         cornerRadius="15"
-        leaderPosition="AUTOMATIC"
         leaderLength="10"
-        leaderWidth="5" />
+        leaderPosition="AUTOMATIC"
+        leaderWidth="0" />
 </resources>

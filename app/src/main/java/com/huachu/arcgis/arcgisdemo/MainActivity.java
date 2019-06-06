@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.blankj.utilcode.util.ImageUtils;
@@ -226,8 +227,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 try {
-                    if (graphic != null)
-                        graphic.setSelected(false);
+                    //if (graphic != null)
+                    //graphic.setSelected(false);
                     IdentifyGraphicsOverlayResult identifyGraphicsOverlayResult = identifyResultsFuture.get();
                     List<Graphic> graphics = identifyGraphicsOverlayResult.getGraphics();
                     // if a graphic has been identified
@@ -235,7 +236,7 @@ public class MainActivity extends AppCompatActivity {
                         //get the first graphic identified
                         Graphic identifiedGraphic = graphics.get(0);
                         graphic = identifiedGraphic;
-                        identifiedGraphic.setSelected(true);
+                        //identifiedGraphic.setSelected(true);
                         showCallout(identifiedGraphic);
                     } else {
                         // if no graphic identified
@@ -255,9 +256,16 @@ public class MainActivity extends AppCompatActivity {
         // set the text of the Callout to graphic's attributes
         calloutContent.setText(graphic.getAttributes().get("name").toString());*/
         // get Callout
-        View calloutLayout = LayoutInflater.from(this).inflate(R.layout.related_features_callout, null);
+        View calloutLayout = LayoutInflater.from(this).inflate(R.layout.infowindow, null);
         // create a text view and add park name
-        TextView parkText = calloutLayout.findViewById(R.id.park_name);
+        TextView parkText = calloutLayout.findViewById(R.id.mc);
+        ImageView close = calloutLayout.findViewById(R.id.close);
+        close.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mCallout.dismiss();
+            }
+        });
         parkText.setText(graphic.getAttributes().get("name").toString());
         // set Callout options: animateCallout: true, recenterMap: false, animateRecenter: false
         mCallout.setShowOptions(new Callout.ShowOptions(true, false, false));
@@ -304,19 +312,8 @@ public class MainActivity extends AppCompatActivity {
         mLocationDisplay.startAsync();
     }
 
-    private void createPolygonGraphics() {//面
-        PointCollection polygonPoints = new PointCollection(SpatialReferences.getWgs84());
-        polygonPoints.add(new Point(114.70372100524446, 38.03519536420519));
-        polygonPoints.add(new Point(114.71766916267414, 38.03505116445459));
-        polygonPoints.add(new Point(114.71923322580597, 38.04919407570509));
-        polygonPoints.add(new Point(114.71631129436038, 38.04915962906471));
-        polygonPoints.add(new Point(114.71526020370266, 38.059921300916244));
-        polygonPoints.add(new Point(114.71153226844807, 38.06035488360282));
-        polygonPoints.add(new Point(114.70803735010169, 38.05014385296186));
-        polygonPoints.add(new Point(114.69877903513455, 38.045182336992816));
-        polygonPoints.add(new Point(114.6979656552508, 38.040267760924316));
-        polygonPoints.add(new Point(114.70259112469694, 38.038800278306674));
-        polygonPoints.add(new Point(114.70372100524446, 38.03519536420519));
+    private void createPolygonGraphics(PointCollection polygonPoints) {//面
+
 
         Polygon polygon = new Polygon(polygonPoints);
         SimpleFillSymbol polygonSymbol = new SimpleFillSymbol(SimpleFillSymbol.Style.SOLID, Color.argb(60, 226, 119, 40),
@@ -330,14 +327,8 @@ public class MainActivity extends AppCompatActivity {
         //mMapView.setViewpointCenterAsync(new Point(114.71153226844807, 38.06035488360282));
     }
 
-    private void createPolylineGraphics() {//线
-        PointCollection polylinePoints = new PointCollection(SpatialReferences.getWgs84());
-        polylinePoints.add(new Point(114.72511, 38.09042));
-        polylinePoints.add(new Point(114.72511, 38.08842));
-        polylinePoints.add(new Point(114.72511, 38.08642));
-        polylinePoints.add(new Point(114.72511, 38.08442));
-        polylinePoints.add(new Point(114.72511, 38.08242));
-        polylinePoints.add(new Point(114.72511, 38.08042));
+    private void createPolylineGraphics(PointCollection polylinePoints) {//线
+
 
         Polyline polyline = new Polyline(polylinePoints);
         // show the original points as red dots on the map
@@ -409,12 +400,31 @@ public class MainActivity extends AppCompatActivity {
             case R.id.line:
                 mCallout.dismiss();
                 mGraphicsOverlay.getGraphics().clear();
-                createPolylineGraphics();//线
+                PointCollection polylinePoints = new PointCollection(SpatialReferences.getWgs84());
+                polylinePoints.add(new Point(114.72511, 38.09042));
+                polylinePoints.add(new Point(114.72511, 38.08842));
+                polylinePoints.add(new Point(114.72511, 38.08642));
+                polylinePoints.add(new Point(114.72511, 38.08442));
+                polylinePoints.add(new Point(114.72511, 38.08242));
+                polylinePoints.add(new Point(114.72511, 38.08042));
+                createPolylineGraphics(polylinePoints);//线
                 break;
             case R.id.fill:
                 mCallout.dismiss();
                 mGraphicsOverlay.getGraphics().clear();
-                createPolygonGraphics();//面
+                PointCollection polygonPoints = new PointCollection(SpatialReferences.getWgs84());
+                polygonPoints.add(new Point(114.70372100524446, 38.03519536420519));
+                polygonPoints.add(new Point(114.71766916267414, 38.03505116445459));
+                polygonPoints.add(new Point(114.71923322580597, 38.04919407570509));
+                polygonPoints.add(new Point(114.71631129436038, 38.04915962906471));
+                polygonPoints.add(new Point(114.71526020370266, 38.059921300916244));
+                polygonPoints.add(new Point(114.71153226844807, 38.06035488360282));
+                polygonPoints.add(new Point(114.70803735010169, 38.05014385296186));
+                polygonPoints.add(new Point(114.69877903513455, 38.045182336992816));
+                polygonPoints.add(new Point(114.6979656552508, 38.040267760924316));
+                polygonPoints.add(new Point(114.70259112469694, 38.038800278306674));
+                polygonPoints.add(new Point(114.70372100524446, 38.03519536420519));
+                createPolygonGraphics(polygonPoints);//面
                 break;
             case R.id.location:
                 mCallout.dismiss();

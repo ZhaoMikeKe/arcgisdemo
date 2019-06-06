@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/shape_edittext2"
+    android:orientation="vertical"
+    android:paddingLeft="8dp"
+    android:paddingRight="8dp"
+    android:paddingBottom="8dp">
+
+
+    <FrameLayout
+        android:layout_width="280dp"
+        android:layout_height="wrap_content"
+        android:padding="5dp">
+
+        <ImageView
+            android:id="@+id/close"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:src="@mipmap/close" />
+
+        <TextView
+            android:id="@+id/name"
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            tools:text="住地" />
+
+    </FrameLayout>
+
+
+    <LinearLayout
+        android:layout_width="280dp"
+        android:layout_height="wrap_content">
+
+        <TextView
+            style="@style/TextView_Style1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:text="名称:" />
+
+        <TextView
+            android:id="@+id/mc"
+            style="@style/TextView_Style2"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            tools:text="2" />
+
+        <TextView
+            style="@style/TextView_Style1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:text="当前车速:" />
+
+        <TextView
+            android:id="@+id/chesu"
+            style="@style/TextView_Style2"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            tools:text="4" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="280dp"
+        android:layout_height="wrap_content">
+
+        <TextView
+            style="@style/TextView_Style1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:text="车牌号:" />
+
+        <TextView
+            android:id="@+id/chepai"
+            style="@style/TextView_Style2"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            tools:text="2" />
+
+
+        <TextView
+            style="@style/TextView_Style1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:text="代号名称:" />
+
+        <TextView
+            android:id="@+id/weizhi"
+            style="@style/TextView_Style2"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            tools:text="4" />
+
+    </LinearLayout>
+
+
+</LinearLayout>
