@@ -17,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.blankj.utilcode.util.ImageUtils;
+import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.esri.arcgisruntime.concurrent.ListenableFuture;
 import com.esri.arcgisruntime.geometry.GeodeticCurveType;
@@ -81,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
         rxPermissions = new RxPermissions(this);
         TextView tvCompany = findViewById(R.id.tv_company);
         initPermissions();//权限申请
+        LogUtils.dTag("zhaoo", "onCreate");
         tvCompany.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -105,8 +107,8 @@ public class MainActivity extends AppCompatActivity {
                 MainActivity.this.startActivity(share_intent);*/
             }
         });
-
-        setupMap();//地图设置
+        setSetting();
+        //setupMap();//地图设置
        /* new Thread(new Runnable() {
             @Override
             public void run() {
@@ -118,63 +120,24 @@ public class MainActivity extends AppCompatActivity {
         //setupLocationDisplay();//定位
     }
 
-    double mScale;
+    private void setSetting() {
+        String url = getString(R.string.url);
+        mapImageLayer = new ArcGISTiledLayer(url);
+        map = new ArcGISMap(SpatialReference.create(3857));
+        map.getOperationalLayers().add(mapImageLayer);
+        mGraphicsOverlay = new GraphicsOverlay();
+        mMapView.getGraphicsOverlays().add(mGraphicsOverlay);
+        mMapView.setAttributionTextVisible(false);//去掉最下面的水印
+        mMapView.setMap(map);
+        mCallout = mMapView.getCallout();
+        // 设定单击事件
+        mMapView.setOnTouchListener(new DefaultMapViewOnTouchListener(this, mMapView) {
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        if (mMapView != null) {
-            //mScale = mMapView.getMapScale();
-            mMapView.pause();
-
-        }
-
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (mMapView != null) {
-            //mMapView.setViewpointScaleAsync(mScale);
-            mMapView.resume();
-        }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (mMapView != null) {
-            mMapView.dispose();
-        }
-
-    }
-
-    ArcGISTiledLayer mapImageLayer;
-    ArcGISMap map;
-
-    @SuppressLint("ClickableViewAccessibility")
-    private void setupMap() {
-        if (mMapView != null) {
-            String url = getString(R.string.url);
-            mapImageLayer = new ArcGISTiledLayer(url);
-            map = new ArcGISMap(SpatialReference.create(3857));
-            map.getOperationalLayers().add(mapImageLayer);
-            Point centerPoint = new Point(114.71511, 38.09042);
-            Point point = (Point) GeometryEngine.project(centerPoint, SpatialReference.create(4326));
-            mGraphicsOverlay = new GraphicsOverlay();
-            mMapView.getGraphicsOverlays().add(mGraphicsOverlay);
-            mMapView.setMap(map);
-            mMapView.setViewpoint(new Viewpoint(point, 100000));
-            mMapView.setAttributionTextVisible(false);//去掉最下面的水印
-            mCallout = mMapView.getCallout();
-            // 设定单击事件
-            mMapView.setOnTouchListener(new DefaultMapViewOnTouchListener(this, mMapView) {
-
-                @Override
-                public boolean onSingleTapConfirmed(MotionEvent motionEvent) {
+            @Override
+            public boolean onSingleTapConfirmed(MotionEvent motionEvent) {
 
 
-                    // get the point that was clicked and convert it to a point in map coordinates
+                // get the point that was clicked and convert it to a point in map coordinates
                   /*  android.graphics.Point screenPoint = new android.graphics.Point(Math.round(motionEvent.getX()),
                             Math.round(motionEvent.getY()));
                     // create a map point from screen point
@@ -220,12 +183,67 @@ public class MainActivity extends AppCompatActivity {
                             }
                         }
                     }*/
-                    identifyGraphic(motionEvent);//判断点击的graphic
-                    return true;
-                }
-            });
+                identifyGraphic(motionEvent);//判断点击的graphic
+                return true;
+            }
+        });
+    }
 
+    double mScale;
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        LogUtils.dTag("zhaoo", "onPause");
+        if (mMapView != null) {
+            //mScale = mMapView.getMapScale();
+            mMapView.pause();
+        }
+
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        LogUtils.dTag("zhaoo", "onStart");
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        LogUtils.dTag("zhaoo", "onRestart");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        LogUtils.dTag("zhaoo", "onResume");
+        if (mMapView != null) {
+            //mMapView.setViewpointScaleAsync(mScale);
+            setupMap();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        LogUtils.dTag("zhaoo", "onDestroy");
+        if (mMapView != null) {
+            mMapView.dispose();
+        }
+
+    }
+
+    ArcGISTiledLayer mapImageLayer;
+    ArcGISMap map;
+
+    @SuppressLint("ClickableViewAccessibility")
+    private void setupMap() {
+        if (mMapView != null) {
+            Point centerPoint = new Point(114.71511, 38.09042);
+            Point point = (Point) GeometryEngine.project(centerPoint, SpatialReference.create(4326));
+            mMapView.setViewpoint(new Viewpoint(point, 100000));
+            mMapView.resume();
         }
     }
 
@@ -464,8 +482,6 @@ public class MainActivity extends AppCompatActivity {
                 mMapView.setViewpointScaleAsync(scale);
                 break;
             case R.id.zhexian://折线
-                mCallout.dismiss();
-                mGraphicsOverlay.getGraphics().clear();
                 zhexian();
                 break;
         }
