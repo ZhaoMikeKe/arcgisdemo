@@ -5,4 +5,6 @@
     <color name="colorAccent">#D81B60</color>
     <color name="black">#000</color>
     <color name="white">#fff</color>
+    <!-- Editor Toolbar -->
+    <color name="toolbar_background">#FF444444</color>
 </resources>

@@ -44,6 +44,30 @@
                 android:layout_height="wrap_content"
                 android:text="定位"
                 android:visibility="gone" />
+
+            <Button
+                android:id="@+id/distance"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="测距" />
+
+            <Button
+                android:id="@+id/jia"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="+" />
+
+            <Button
+                android:id="@+id/jian"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="-" />
+
+            <Button
+                android:id="@+id/zhexian"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="操作" />
         </LinearLayout>
     </ScrollView>
 

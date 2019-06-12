@@ -3,6 +3,7 @@ package com.huachu.arcgis.arcgisdemo;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
@@ -16,8 +17,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.blankj.utilcode.util.ImageUtils;
+import com.blankj.utilcode.util.ToastUtils;
 import com.esri.arcgisruntime.concurrent.ListenableFuture;
+import com.esri.arcgisruntime.geometry.GeodeticCurveType;
+import com.esri.arcgisruntime.geometry.Geometry;
 import com.esri.arcgisruntime.geometry.GeometryEngine;
+import com.esri.arcgisruntime.geometry.LinearUnit;
+import com.esri.arcgisruntime.geometry.LinearUnitId;
 import com.esri.arcgisruntime.geometry.Multipoint;
 import com.esri.arcgisruntime.geometry.Point;
 import com.esri.arcgisruntime.geometry.PointCollection;
@@ -38,8 +44,10 @@ import com.esri.arcgisruntime.mapping.view.MapView;
 import com.esri.arcgisruntime.symbology.PictureMarkerSymbol;
 import com.esri.arcgisruntime.symbology.SimpleFillSymbol;
 import com.esri.arcgisruntime.symbology.SimpleLineSymbol;
+import com.esri.arcgisruntime.symbology.SimpleMarkerSymbol;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -110,37 +118,46 @@ public class MainActivity extends AppCompatActivity {
         //setupLocationDisplay();//定位
     }
 
+    double mScale;
+
     @Override
     protected void onPause() {
-        if (mMapView != null) {
-            mMapView.pause();
-        }
         super.onPause();
+        if (mMapView != null) {
+            //mScale = mMapView.getMapScale();
+            mMapView.pause();
+
+        }
+
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         if (mMapView != null) {
+            //mMapView.setViewpointScaleAsync(mScale);
             mMapView.resume();
         }
     }
 
     @Override
     protected void onDestroy() {
+        super.onDestroy();
         if (mMapView != null) {
             mMapView.dispose();
         }
-        super.onDestroy();
+
     }
 
+    ArcGISTiledLayer mapImageLayer;
+    ArcGISMap map;
 
     @SuppressLint("ClickableViewAccessibility")
     private void setupMap() {
         if (mMapView != null) {
             String url = getString(R.string.url);
-            ArcGISTiledLayer mapImageLayer = new ArcGISTiledLayer(url);
-            ArcGISMap map = new ArcGISMap(SpatialReference.create(3857));
+            mapImageLayer = new ArcGISTiledLayer(url);
+            map = new ArcGISMap(SpatialReference.create(3857));
             map.getOperationalLayers().add(mapImageLayer);
             Point centerPoint = new Point(114.71511, 38.09042);
             Point point = (Point) GeometryEngine.project(centerPoint, SpatialReference.create(4326));
@@ -389,7 +406,7 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
-    @OnClick({R.id.location, R.id.point, R.id.line, R.id.fill})
+    @OnClick({R.id.zhexian, R.id.jia, R.id.jian, R.id.distance, R.id.location, R.id.point, R.id.line, R.id.fill})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.point:
@@ -431,7 +448,74 @@ public class MainActivity extends AppCompatActivity {
                 mGraphicsOverlay.getGraphics().clear();
                 setupLocationDisplay();
                 break;
+            case R.id.distance://测距
+                mCallout.dismiss();
+                mGraphicsOverlay.getGraphics().clear();
+                distance();
+                break;
+            case R.id.jia://加
+                double scale1 = mMapView.getMapScale() - 10000;
+                if (scale1 > 0) {
+                    mMapView.setViewpointScaleAsync(scale1);
+                }
+                break;
+            case R.id.jian://减
+                double scale = mMapView.getMapScale() + 10000;
+                mMapView.setViewpointScaleAsync(scale);
+                break;
+            case R.id.zhexian://折线
+                mCallout.dismiss();
+                mGraphicsOverlay.getGraphics().clear();
+                zhexian();
+                break;
         }
+    }
+
+    private void zhexian() {
+        startActivity(new Intent(this, EditorActivity.class));
+    }
+
+    private final String mUnits = "公里";
+    private final LinearUnit mUnitOfMeasurement = new LinearUnit(LinearUnitId.KILOMETERS);
+
+    private void distance() {
+        // add a graphic at JFK to represent the flight start location //
+        Point start = new Point(114.71511, 38.09042, SpatialReferences.getWgs84());
+        SimpleMarkerSymbol locationMarker = new SimpleMarkerSymbol(SimpleMarkerSymbol.Style.CIRCLE, 0xFF0000FF, 10);
+        Graphic startLocation = new Graphic(start, locationMarker);
+        mGraphicsOverlay.getGraphics().add(startLocation);
+
+        // create graphic for the destination
+        Point end = new Point(114.72511, 38.10042, SpatialReferences.getWgs84());
+        SimpleMarkerSymbol endMarker = new SimpleMarkerSymbol(SimpleMarkerSymbol.Style.CIRCLE, 0xFF0000FF, 10);
+        Graphic endLocation = new Graphic(end, endMarker);
+        mGraphicsOverlay.getGraphics().add(endLocation);
+
+        // create graphic representing the geodesic path between the two locations
+        Graphic path = new Graphic();
+        path.setSymbol(new SimpleLineSymbol(SimpleLineSymbol.Style.DASH, 0xFF0000FF, 5));
+        mGraphicsOverlay.getGraphics().add(path);
+
+        PointCollection points = new PointCollection(Arrays.asList(start, end), SpatialReferences.getWgs84());
+        Polyline polyline = new Polyline(points);
+        // densify the path as a geodesic curve and show it with the path graphic
+        Geometry pathGeometry = GeometryEngine
+                .densifyGeodetic(polyline, 1, mUnitOfMeasurement, GeodeticCurveType.GEODESIC);
+        path.setGeometry(pathGeometry);
+
+        // calculate the path distance
+        double distance = GeometryEngine.lengthGeodetic(pathGeometry, mUnitOfMeasurement, GeodeticCurveType.GEODESIC);
+        ToastUtils.showLong("Distance: " + String.format("%.2f", distance) + mUnits);
+        // create a textview for the callout
+       /* TextView calloutContent = new TextView(getApplicationContext());
+        calloutContent.setTextColor(Color.BLACK);
+        calloutContent.setSingleLine();
+        // format coordinates to 2 decimal places
+        calloutContent.setText("Distance: " + String.format("%.2f", distance) + mUnits);
+        Callout callout = mMapView.getCallout();
+        callout.setLocation(end);
+        callout.setContent(calloutContent);
+        callout.show();*/
     }
 
 
