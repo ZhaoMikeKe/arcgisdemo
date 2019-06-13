@@ -68,6 +68,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="操作" />
+
+            <Button
+                android:id="@+id/jibie"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="级别" />
         </LinearLayout>
     </ScrollView>
 

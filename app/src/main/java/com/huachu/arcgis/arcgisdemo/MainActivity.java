@@ -242,7 +242,7 @@ public class MainActivity extends AppCompatActivity {
         if (mMapView != null) {
             Point centerPoint = new Point(114.71511, 38.09042);
             Point point = (Point) GeometryEngine.project(centerPoint, SpatialReference.create(4326));
-            mMapView.setViewpoint(new Viewpoint(point, 100000));
+            mMapView.setViewpointAsync(new Viewpoint(point, 100000));
             mMapView.resume();
         }
     }
@@ -424,7 +424,7 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
-    @OnClick({R.id.zhexian, R.id.jia, R.id.jian, R.id.distance, R.id.location, R.id.point, R.id.line, R.id.fill})
+    @OnClick({R.id.jibie, R.id.zhexian, R.id.jia, R.id.jian, R.id.distance, R.id.location, R.id.point, R.id.line, R.id.fill})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.point:
@@ -483,6 +483,9 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case R.id.zhexian://折线
                 zhexian();
+                break;
+            case R.id.jibie://级别
+                ToastUtils.showLong("级别: " + mMapView.getMapScale());
                 break;
         }
     }
