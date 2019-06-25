@@ -33,6 +33,7 @@ import com.esri.arcgisruntime.geometry.Polyline;
 import com.esri.arcgisruntime.geometry.SpatialReference;
 import com.esri.arcgisruntime.geometry.SpatialReferences;
 import com.esri.arcgisruntime.layers.ArcGISTiledLayer;
+import com.esri.arcgisruntime.layers.WmsLayer;
 import com.esri.arcgisruntime.mapping.ArcGISMap;
 import com.esri.arcgisruntime.mapping.Viewpoint;
 import com.esri.arcgisruntime.mapping.view.Callout;
@@ -48,6 +49,7 @@ import com.esri.arcgisruntime.symbology.SimpleLineSymbol;
 import com.esri.arcgisruntime.symbology.SimpleMarkerSymbol;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -424,7 +426,7 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
-    @OnClick({R.id.jibie, R.id.zhexian, R.id.jia, R.id.jian, R.id.distance, R.id.location, R.id.point, R.id.line, R.id.fill})
+    @OnClick({R.id.shishiliu, R.id.jibie, R.id.zhexian, R.id.jia, R.id.jian, R.id.distance, R.id.location, R.id.point, R.id.line, R.id.fill})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.point:
@@ -487,7 +489,20 @@ public class MainActivity extends AppCompatActivity {
             case R.id.jibie://级别
                 ToastUtils.showLong("级别: " + mMapView.getMapScale());
                 break;
+            case R.id.shishiliu://实时流
+                addSSL();
+                break;
         }
+    }
+
+    private void addSSL() {
+        List<String> wmsLayerNames = new ArrayList<>();
+        wmsLayerNames.add("flow_layer");
+        WmsLayer wmsLayer = new WmsLayer(getString(R.string.wms_layer_url2), wmsLayerNames);
+        map.getOperationalLayers().add(wmsLayer);
+        Point centerPoint = new Point(117.21, 39.12);
+        Point point = (Point) GeometryEngine.project(centerPoint, SpatialReference.create(4326));
+        mMapView.setViewpointAsync(new Viewpoint(point, 1000000));
     }
 
     private void zhexian() {

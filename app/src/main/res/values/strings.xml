@@ -11,4 +11,8 @@
     <string name="undoButtonDescription">Undo</string>
     <string name="redoButtonDescription">Redo</string>
     <string name="stopButtonDescription">Stop</string>
+    <string name="wms_layer_url1">https://nowcoast.noaa.gov/arcgis/services/nowcoast/radar_meteo_imagery_nexrad_time/MapServer/WMSServer?request=GetCapabilities&amp;service=WMS</string>
+    <string name="wms_layer_url">http://192.168.1.107:8080/geoserver/hc/wms?request=GetMap&amp;service=WMS&amp;version=1.1.0</string>
+    <string name="wms_layer_url2">http://192.168.1.107:8080/geoserver/hc/wms?request=GetCapabilities&amp;service=WMS</string>
+
 </resources>
